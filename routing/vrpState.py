@@ -135,6 +135,8 @@ class VrpState():
 
         if sumPayload > Vtol().maxPayload_kg or vtolRouting.BC > 100:
             vtolBC += self.CAP_PENALTY
+            if vtolRouting.BC > 100:
+                vtolBC += (vtolRouting.BC-100)*self.BATTERY_PENALTY
             if sumPayload > Vtol().maxPayload_kg:
                 vtolBC += (sumPayload - Vtol().maxPayload_kg)*10*self.PAYLOAD_PENALTY
             
