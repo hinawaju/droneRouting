@@ -8,7 +8,7 @@ from routing.vrp import VRP
 from model.multicopter import Multi
 from model.vtol import Vtol
 from field.map import Map
-import openpyxl
+#import openpyxl
 from matplotlib import pyplot
 from routing.vrpState import VrpState
 from routing.singleRouting import SingleRouting
@@ -194,6 +194,9 @@ def main5(mapFilePath,droneNum):
 
     state = vrp.anneal()
     print()
+    f = open('data/result.txt','a')
+    #f.write("drone type, distance, payload, BC"+"\n")
+    
     #for i in range(droneNum):
     #    if len(state[0].eachFlights[i])==0:
     #        continue
@@ -212,58 +215,30 @@ def main5(mapFilePath,droneNum):
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
         print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'))
-    print(vrp.best_score)
+        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+"\n")
+    f.close
 
-def gomi():
-    multi_list = [(2,0.3,5.24),
-                  (1,0.1,2.83),
-                  (1,0.1,18),
-                  (2,0.2,16.41),
-                  (4,0.5,19.89),
-                  (1,0.2,2),
-                  (3,0.7,9.05),
-                  (3,0.5,7.24),
-                  (2,0.5,7.63),
-                  (2,0.4,6),
-                  (2,0.4,6.65),
-                  (5,0.7,13.73),
-                  (4,0.7,12.6),
-                  (4,0.5,10.94),
-                  (3,0.5,10.34),
-                  (7,0.8,15)]
-    
-    vtol_list = [(3,0.8,25.61),
-                 (3,0.9,17.92),
-                 (3,1,21.57),
-                 (3,0.7,13.91),
-                 (3,1,20.31),
-                 (2,0.8,10.99),
-                 (3,0.8,16.19),
-                 (4,1,19.63),
-                 (3,0.9,19.97),
-                 (3,0.9,15.72),
-                 (4,0.9,22.07),
-                 (4,1,22.22),
-                 (4,0.9,22.25),
-                 (4,0.6,21.76),
-                 (3,0.5,27.11),
-                 (3,0.4,30.02),
-                 (4,0.7,25.16),
-                 (4,0.7,25.22),
-                 (1,0.2,18.44),
-                 (3,0.4,24.09),
-                 (3,0.4,19.09),
-                 (4,0.5,22.53),
-                 (4,0.6,23.63)]
-    
+def readResultFile(path):
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
-
-    for p in multi_list: #  ノードのプロット
-        ax.plot(*[p[2],p[1]], 'o', color="red")
     
-    for p in vtol_list: #  ノードのプロット
-        ax.plot(*[p[2],p[1]], 'o', color="blue")
+    f = open(path,'r')
+    next(f) #  ファイルの2行目から読み込み
+    
+    while True: #  マップのファイルから顧客リストを作成
+        flightStr = f.readline() #  ファイルから1行読む
+        if flightStr == '': #  EOFになったら終了
+            break
+    
+        flightResultList = flightStr.split(',')
+        #print(flightResultList[0])
+        payload = float(flightResultList[1])
+        distance = float(flightResultList[2])
+    
+        if flightResultList[0] == "multi copter":
+            ax.plot(*[payload,distance], 'o', color="red")
+        elif flightResultList[0] == "vtol":
+            ax.plot(*[payload,distance], 'o', color="blue")
         
     ax.set_xlim([0, 35])
     ax.set_ylim([0, 1.2])
@@ -275,7 +250,7 @@ def gomi():
         
         
 if __name__ == "__main__":
-    #main06('data/large5.txt',10,10,0.1)
-    #main5('data/map4.txt',5)
-    gomi()
+    main06('data/large5.txt',10,10,0.1)
+    main5('data/large5.txt',10)
+    readResultFile('data/result.txt')
     #main01()

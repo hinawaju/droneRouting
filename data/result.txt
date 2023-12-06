@@ -1,0 +1,5 @@
+drone type, distance, payload, BC
+vtol,24.47,0.40,95.50
+multi copter,13.42,0.10,40.77
+vtol,26.73,0.30,91.11
+vtol,33.31,0.20,96.44
