@@ -163,7 +163,7 @@ def main4(mapFilePath):
     print("BC",tsp.BC,"FT",tsp.FT)
     
 #3機以上のドローンで
-def main5(mapFilePath,droneNum):
+def main5(mapFilePath,droneNum,area_km2,nodeNum):
     map = Map(mapFilePath)
     customerList = map.customerList
     #初期解作成
@@ -208,15 +208,31 @@ def main5(mapFilePath,droneNum):
     #state[0].plotRouteFig()
     
     #分析用
+    vtolUsage = 0
+    multiUsage = 0
+    usedDrone = droneNum
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
+            usedDrone -= 1
             continue
         d = 0
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
         print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'))
         f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+"\n")
+        if state[0].cost_list[i][0].type == "multi copter":
+            multiUsage += 1
+        elif state[0].cost_list[i][0].type == "vtol":
+            vtolUsage += 1
     f.close
+    
+    f_m = open("data/multiUsage","a")
+    f_m.write(str(area_km2)+","+str(nodeNum)+","+str(multiUsage/usedDrone *100))
+    f_m.close
+    
+    f_v = open("data/vtolUsage","a")
+    f_v.write(str(area_km2)+","+str(nodeNum)+","+str(vtolUsage/usedDrone *100))
+    f_v.close
 
 def plotResultFile(path):
     fig = pyplot.figure()
@@ -249,7 +265,7 @@ def plotResultFile(path):
         
         
 if __name__ == "__main__":
-    main06('data/large5.txt',10,10,0.2)
-    main5('data/large5.txt',10)
+    main06('data/large5.txt',N=10,r=10,p=0.2)
+    main5('data/large5.txt',droneNum=10,area_km2=100,nodeNum=10)
     #plotResultFile('data/result.txt')
     #main01()
