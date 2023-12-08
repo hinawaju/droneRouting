@@ -10,6 +10,9 @@ from model.vtol import Vtol
 from field.map import Map
 #import openpyxl
 from matplotlib import pyplot
+import matplotlib as mpl
+import matplotlib.cm as cm
+import numpy as np
 from routing.vrpState import VrpState
 from routing.singleRouting import SingleRouting
 
@@ -263,9 +266,41 @@ def plotResultFile(path):
     
     pyplot.show()
         
+def plotUsageFile(path):
+    fig = pyplot.figure()
+    ax = fig.add_subplot(111)
+    
+    ax.set_xlabel("delivery area (km2)")
+    ax.set_ylabel("costomer")
+    #ax.set_xlim([0, 120])
+    #ax.set_ylim([0, 1.2])
+    
+    ax.grid(axis="both")
+    
+    f = open(path,'r')
+    next(f) #  ファイルの2行目から読み込み
+    
+    while True: 
+        usageStr = f.readline() #  ファイルから1行読む
+        if usageStr == '': #  EOFになったら終了
+            break
+    
+        usageList = usageStr.split(',')
+        area = float(usageList[0])
+        nodeNum = float(usageList[1])
+        usage = int(usageList[2])
+    
+        mp = ax.scatter(area,nodeNum,s=50,c=usage,cmap="rainbow",vmin=0,vmax=100)
+        
+    cbar = pyplot.colorbar(mp)
+    cbar.ax.set_ylim(0,100)
+    cbar.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(10))
+    
+    pyplot.show()
         
 if __name__ == "__main__":
-    main06('data/large5.txt',N=10,r=10,p=0.2)
-    main5('data/large5.txt',droneNum=10,area_km2=100,nodeNum=10)
+    #main06('data/large5.txt',N=10,r=10,p=0.2)
+    #main5('data/large5.txt',droneNum=10,area_km2=100,nodeNum=10)
     #plotResultFile('data/result.txt')
+    plotUsageFile("data/multiUsage")
     #main01()
