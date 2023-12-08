@@ -218,7 +218,7 @@ def main5(mapFilePath,droneNum):
         f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+"\n")
     f.close
 
-def readResultFile(path):
+def plotResultFile(path):
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
     
@@ -231,7 +231,6 @@ def readResultFile(path):
             break
     
         flightResultList = flightStr.split(',')
-        #print(flightResultList[0])
         payload = float(flightResultList[1])
         distance = float(flightResultList[2])
     
@@ -250,7 +249,7 @@ def readResultFile(path):
         
         
 if __name__ == "__main__":
-    main06('data/large5.txt',10,10,0.1)
+    main06('data/large5.txt',10,10,0.2)
     main5('data/large5.txt',10)
-    readResultFile('data/result.txt')
+    #plotResultFile('data/result.txt')
     #main01()
