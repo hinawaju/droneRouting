@@ -23,7 +23,7 @@ class VrpState():
         self.change_flight_2 = None
         self.CAP_PENALTY = 30 # batteryとpayload制限を超えた場合にコストに追加するペナルティ
         self.PAYLOAD_PENALTY = 20 # payload制限超えたときにpayload%10*payload_penaltyを追加
-        self.BATTERY_PENALTY = 1 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
+        self.BATTERY_PENALTY = 2 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
         
         
     def move(self):
