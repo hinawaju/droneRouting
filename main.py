@@ -10,6 +10,9 @@ from model.vtol import Vtol
 from field.map import Map
 #import openpyxl
 from matplotlib import pyplot
+import matplotlib as mpl
+import matplotlib.cm as cm
+import numpy as np
 from routing.vrpState import VrpState
 from routing.singleRouting import SingleRouting
 
@@ -163,7 +166,7 @@ def main4(mapFilePath):
     print("BC",tsp.BC,"FT",tsp.FT)
     
 #3機以上のドローンで
-def main5(mapFilePath,droneNum):
+def main5(mapFilePath,droneNum,area_km2,nodeNum):
     map = Map(mapFilePath)
     customerList = map.customerList
     #初期解作成
@@ -208,15 +211,31 @@ def main5(mapFilePath,droneNum):
     #state[0].plotRouteFig()
     
     #分析用
+    vtolUsage = 0
+    multiUsage = 0
+    usedDrone = droneNum
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
+            usedDrone -= 1
             continue
         d = 0
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
         print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'))
         f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+"\n")
+        if state[0].cost_list[i][0].type == "multi copter":
+            multiUsage += 1
+        elif state[0].cost_list[i][0].type == "vtol":
+            vtolUsage += 1
     f.close
+    
+    f_m = open("data/multiUsage","a")
+    f_m.write(str(area_km2)+","+str(nodeNum)+","+str(multiUsage/usedDrone *100))
+    f_m.close
+    
+    f_v = open("data/vtolUsage","a")
+    f_v.write(str(area_km2)+","+str(nodeNum)+","+str(vtolUsage/usedDrone *100))
+    f_v.close
 
 def plotResultFile(path):
     fig = pyplot.figure()
@@ -247,9 +266,41 @@ def plotResultFile(path):
     
     pyplot.show()
         
+def plotUsageFile(path):
+    fig = pyplot.figure()
+    ax = fig.add_subplot(111)
+    
+    ax.set_xlabel("delivery area (km2)")
+    ax.set_ylabel("costomer")
+    #ax.set_xlim([0, 120])
+    #ax.set_ylim([0, 1.2])
+    
+    ax.grid(axis="both")
+    
+    f = open(path,'r')
+    next(f) #  ファイルの2行目から読み込み
+    
+    while True: 
+        usageStr = f.readline() #  ファイルから1行読む
+        if usageStr == '': #  EOFになったら終了
+            break
+    
+        usageList = usageStr.split(',')
+        area = float(usageList[0])
+        nodeNum = float(usageList[1])
+        usage = int(usageList[2])
+    
+        mp = ax.scatter(area,nodeNum,s=50,c=usage,cmap="rainbow",vmin=0,vmax=100)
+        
+    cbar = pyplot.colorbar(mp)
+    cbar.ax.set_ylim(0,100)
+    cbar.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(10))
+    
+    pyplot.show()
         
 if __name__ == "__main__":
-    main06('data/large5.txt',10,10,0.2)
-    main5('data/large5.txt',10)
+    #main06('data/large5.txt',N=10,r=10,p=0.2)
+    #main5('data/large5.txt',droneNum=10,area_km2=100,nodeNum=10)
     #plotResultFile('data/result.txt')
+    plotUsageFile("data/multiUsage")
     #main01()
