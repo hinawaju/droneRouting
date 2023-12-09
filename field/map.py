@@ -16,7 +16,8 @@ class Map:
         self.dMatrix = [] #  距離の表
         self.CN = 0
         self.N = 0
-        self.maxXY = 0
+        #self.maxXY = 0
+        self.r = 0
         self.depo = node.Node(0,0,0,0)
         self.nodeList.append(self.depo)
         self.readMapFile(mapFilePass)
@@ -58,7 +59,7 @@ class Map:
     
     def criateLargeMapFile(N:int,r,p,path):
         f = open(path,'w')
-        f.write("x-axis, y-axis, demand")
+        f.write(str(2*r)+", x-axis, y-axis, demand")
         maplist = []
         _r = -1*r
 
@@ -88,7 +89,9 @@ class Map:
                                                                              
     def readMapFile(self,fileName):
         f = open(fileName,'r')
-        next(f) #  ファイルの2行目から読み込み
+        firstStr = f.readline()
+        firstList = firstStr.split(',')
+        self.r = int(firstList[0])
         nodeNum = 1 #  nodeListのインデックスと対応
 
         while True: #  マップのファイルから顧客リストを作成
@@ -97,11 +100,11 @@ class Map:
                 break
             nodeList = nodeStr.split(',') #  カンマで分割してx座標,y座標,demandを取得
             x = int(nodeList[0])
-            if x > self.maxXY:
-                self.maxXY = x
+            #if x > self.maxXY:
+            #    self.maxXY = x
             y = int(nodeList[1])
-            if y > self.maxXY:
-                self.maxXY = y
+            #if y > self.maxXY:
+            #    self.maxXY = y
             demand = float(nodeList[2])
             n = node.Node(nodeNum,x,y,demand) #  nodeクラスに変換
             self.customerList.append(n) #  顧客リストに追加
