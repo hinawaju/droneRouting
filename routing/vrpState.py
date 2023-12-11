@@ -92,14 +92,14 @@ class VrpState():
         else:
             return
         
-    def calcScore(self):
+    def calcScore(self):#TODO バッテリ消費量の単位を％からJなどに変更
         sum_BC = 0
         for touple in self.cost_list:
             sum_BC += touple[2]
         
         return sum_BC
     
-    def calcCost(self,map_id):
+    def calcCost(self,map_id):#TODO バッテリ消費量の単位を％からJなどに変更
         
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
             self.cost_list[map_id] = (Airframe(),0,0,0)

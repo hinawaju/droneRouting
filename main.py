@@ -308,11 +308,11 @@ def tryNtimes(N):
         main5(mapName,droneNum=customer)
     
     plotUsageFile("data/multiUsage")
+    plotResultFile('data/result.txt')
         
         
 if __name__ == "__main__":
     #main06('data/large5.txt',N=10,r=10,p=0.2)
     #main5('data/large5.txt',droneNum=10)
-    #plotResultFile('data/result.txt')
-    #plotUsageFile("data/multiUsage")
-    tryNtimes(18)
+    
+    tryNtimes(20)
