@@ -166,7 +166,7 @@ def main4(mapFilePath):
     print("BC",tsp.BC,"FT",tsp.FT)
     
 #3機以上のドローンで
-def main5(mapFilePath,droneNum,area_km2,nodeNum):
+def main5(mapFilePath,droneNum):
     map = Map(mapFilePath)
     customerList = map.customerList
     #初期解作成
@@ -230,11 +230,11 @@ def main5(mapFilePath,droneNum,area_km2,nodeNum):
     f.close
     
     f_m = open("data/multiUsage","a")
-    f_m.write(str(area_km2)+","+str(nodeNum)+","+str(multiUsage/usedDrone *100))
+    f_m.write(str(2*map.r)+","+str(map.CN)+","+str(multiUsage/usedDrone *100)+",\n")
     f_m.close
     
     f_v = open("data/vtolUsage","a")
-    f_v.write(str(area_km2)+","+str(nodeNum)+","+str(vtolUsage/usedDrone *100))
+    f_v.write(str(2*map.r)+","+str(map.CN)+","+str(vtolUsage/usedDrone *100)+",\n")
     f_v.close
 
 def plotResultFile(path):
@@ -288,7 +288,7 @@ def plotUsageFile(path):
         usageList = usageStr.split(',')
         area = float(usageList[0])
         nodeNum = float(usageList[1])
-        usage = int(usageList[2])
+        usage = round(float(usageList[2]),2)
     
         mp = ax.scatter(area,nodeNum,s=50,c=usage,cmap="rainbow",vmin=0,vmax=100)
         
@@ -297,10 +297,22 @@ def plotUsageFile(path):
     cbar.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(10))
     
     pyplot.show()
+    
+def tryNtimes(N):
+    for i in range(N):
+        mapName = "data/map"+str(i)+".txt"
+        #ランダムでエリア半径と顧客数を作成
+        r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
+        customer = random.randint(2,25)
+        main06(mapName,customer,r,p=0.3)
+        main5(mapName,droneNum=customer)
+    
+    plotUsageFile("data/multiUsage")
+    plotResultFile('data/result.txt')
+        
         
 if __name__ == "__main__":
     #main06('data/large5.txt',N=10,r=10,p=0.2)
-    #main5('data/large5.txt',droneNum=10,area_km2=100,nodeNum=10)
-    #plotResultFile('data/result.txt')
-    plotUsageFile("data/multiUsage")
-    #main01()
+    #main5('data/large5.txt',droneNum=10)
+    
+    tryNtimes(20)
