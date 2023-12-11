@@ -11,5 +11,6 @@ class Airframe:
     def addPayloadBC():
         pass
 
-    
+    def calcFlightTime(self,distance_km):
+        return distance_km/self.speed_km_m + self.takeOffTime_m
 
