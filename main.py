@@ -315,4 +315,4 @@ if __name__ == "__main__":
     #main06('data/large5.txt',N=10,r=10,p=0.2)
     #main5('data/large5.txt',droneNum=10)
     
-    tryNtimes(20)
+    tryNtimes(18)

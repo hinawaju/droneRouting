@@ -140,7 +140,7 @@ class VrpState():
             if sumPayload > Vtol().maxPayload_kg:
                 vtolBC += (sumPayload - Vtol().maxPayload_kg)*10*self.PAYLOAD_PENALTY
             
-        if multiBC > vtolBC:
+        if multiBC*Multi().battery_J/100 > vtolBC*Vtol().battery_J/100:
             self.cost_list[map_id] = (Vtol(),vtolRouting.FT,vtolBC,sumPayload)
             self.eachFlights[map_id] = vtolRouting.bestRoute
         else :

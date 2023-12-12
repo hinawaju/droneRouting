@@ -1,8 +1,8 @@
 from . import airframe
 
-class Multi(airframe.Airframe):
+class Multi1(airframe.Airframe):
 
-    def __init__(self):# TODO 速度
+    def __init__(self):
         super().__init__()
         self.battery_p = 100  # 機体として正しい値は321120*9/1.4 321120が機体そのままのバッテリー量の7割、今回機体を比較するにあたって機体重量を基準に合わせて9/1.4倍してるのでその他のパラメータも9/1.4倍
         self.battery_J = 1200000
