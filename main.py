@@ -182,13 +182,13 @@ def main5(mapFilePath,droneNum):
         initial_state.calcCost(j)
 
     # 初期解表示
-    
+    """
     for i in range(droneNum):
         print("[",end=" ")
         for n in initial_state.eachFlights[i]:
             print(n.nodeNum,end=", ")
         print("]",initial_state.cost_list[i][0].type,"FT",format(initial_state.cost_list[i][1],'.2f'),"BC",format(initial_state.cost_list[i][2],'.2f'),"payload",format(initial_state.cost_list[i][3],'.2f'))
-    
+    """
     
     vrp = VRP(initial_state)
 
@@ -299,6 +299,19 @@ def plotUsageFile(path):
     pyplot.show()
     
 def tryNtimes(N):
+    #結果出力に必要な３つのファイルを初期化
+    f_r = open('data/result.txt','w')
+    f_r.write("drone type, distance, payload, BC,"+"\n")
+    f_r.close
+    
+    f_m = open('data/multiUsage','w')
+    f_m.write("2r,customer number,usage(%),"+"\n")
+    f_m.close
+    
+    f_v = open('data/vtolUsage','w')
+    f_v.write("2r,customer number,usage(%)"+"\n")
+    f_v.close
+    
     for i in range(N):
         mapName = "data/map"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
@@ -314,5 +327,6 @@ def tryNtimes(N):
 if __name__ == "__main__":
     #main06('data/large5.txt',N=10,r=10,p=0.2)
     #main5('data/large5.txt',droneNum=10)
-    
-    tryNtimes(18)
+    #plotUsageFile("data/multiUsage")
+    #plotResultFile('data/result.txt')
+    tryNtimes(5)
