@@ -1,32 +1,25 @@
-drone type, distance, payload, BC,
-.50,76.70
-vtol,28.07,0.50,88.95
-multi copter,17.89,0.10,53.71
-vtol,30.05,0.60,94.21
-vtol,44.47,0.50,308.97
-vtol,36.42,0.20,170.79
-vtol,31.03,0.40,95.58
-vtol,38.24,0.40,198.14
-vtol,17.10,0.40,60.91
-vtol,29.10,0.20,90.03
-vtol,32.56,0.30,92.83
-vtol,15.39,0.80,64.99
-vtol,28.09,0.70,96.15
-vtol,17.41,0.40,61.74
-vtol,32.74,0.40,99.96
-vtol,32.56,0.10,91.96
-vtol,17.41,0.70,69.72
-vtol,28.88,0.60,96.54
-vtol,46.02,0.30,324.25
-vtol,46.97,0.40,337.65
-vtol,32.27,0.30,98.26
-vtol,38.31,0.60,236.00
-vtol,30.09,0.30,92.90
-vtol,42.30,0.60,288.85
-vtol,27.48,0.40,86.99
-vtol,12.76,0.90,65.35
-vtol,13.05,0.80,64.95
-multi copter,4.47,0.10,14.87
-multi copter,5.24,0.40,22.02
-vtol,18.22,0.90,85.68
-vtol,17.54,1.00,85.51
+drone type, distance, payload, BC
+multi copter,25.91,0.60,60.39
+multi copter,32.42,0.30,70.93
+multi copter,30.65,0.30,66.11
+multi copter,8.94,0.30,21.66
+multi copter,39.63,0.50,86.07
+multi copter,35.28,0.90,80.69
+multi copter,40.91,0.70,90.56
+multi copter,32.21,0.40,70.66
+multi copter,27.33,0.30,60.42
+multi copter,43.79,1.00,99.79
+multi copter,26.92,0.70,61.59
+multi copter,29.56,0.70,66.85
+multi copter,36.71,0.90,84.57
+multi copter,31.21,0.70,70.54
+multi copter,43.91,0.80,99.62
+multi copter,38.83,0.60,85.88
+multi copter,41.95,0.90,95.54
+multi copter,38.53,1.00,89.85
+multi copter,38.41,0.30,83.23
+multi copter,28.34,0.60,65.34
+multi copter,34.24,0.80,78.03
+multi copter,40.91,0.60,91.34
+multi copter,28.32,0.30,61.31
+multi copter,27.10,0.30,59.92

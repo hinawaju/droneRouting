@@ -210,6 +210,7 @@ def main5(mapFilePath,droneNum):
     
     #state[0].plotRouteFig()
     
+    
     #分析用
     vtolUsage = 0
     multiUsage = 0
@@ -221,14 +222,14 @@ def main5(mapFilePath,droneNum):
         d = 0
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
-        print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'))
-        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+"\n")
+        print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][4],'.2f'))
+        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][4],'.2f'))+"\n")
         if state[0].cost_list[i][0].type == "multi copter":
             multiUsage += 1
         elif state[0].cost_list[i][0].type == "vtol":
             vtolUsage += 1
     f.close
-    
+    """
     f_m = open("data/multiUsage","a")
     f_m.write(str(2*map.r)+","+str(map.CN)+","+str(multiUsage/usedDrone *100)+",\n")
     f_m.close
@@ -236,6 +237,8 @@ def main5(mapFilePath,droneNum):
     f_v = open("data/vtolUsage","a")
     f_v.write(str(2*map.r)+","+str(map.CN)+","+str(vtolUsage/usedDrone *100)+",\n")
     f_v.close
+    
+    """
 
 def plotResultFile(path):
     fig = pyplot.figure()
@@ -299,34 +302,38 @@ def plotUsageFile(path):
     pyplot.show()
     
 def tryNtimes(N):
+    """
     #結果出力に必要な３つのファイルを初期化
     f_r = open('data/result.txt','w')
-    f_r.write("drone type, distance, payload, BC,"+"\n")
+    f_r.write("drone type, distance, payload, BC\n")
     f_r.close
     
     f_m = open('data/multiUsage','w')
-    f_m.write("2r,customer number,usage(%),"+"\n")
+    f_m.write("2r,customer number,usage(%)\n")
     f_m.close
     
     f_v = open('data/vtolUsage','w')
-    f_v.write("2r,customer number,usage(%)"+"\n")
+    f_v.write("2r,customer number,usage(%)\n")
     f_v.close
+    """
     
     for i in range(N):
         mapName = "data/map"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
-        r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
-        customer = random.randint(2,25)
-        main06(mapName,customer,r,p=0.3)
+        #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
+        r=10
+        #customer = random.randint(2,25)
+        customer = 10
+        main06(mapName,customer,r,p=0.2)
         main5(mapName,droneNum=customer)
     
-    plotUsageFile("data/multiUsage")
+    #plotUsageFile("data/multiUsage")
     plotResultFile('data/result.txt')
         
         
 if __name__ == "__main__":
-    #main06('data/large5.txt',N=10,r=10,p=0.2)
+    #main06('data/large5.txt',N=10,r=3,p=0.2)
     #main5('data/large5.txt',droneNum=10)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')
-    tryNtimes(5)
+    tryNtimes(10)

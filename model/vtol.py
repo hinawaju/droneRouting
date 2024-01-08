@@ -7,7 +7,7 @@ class Vtol(airframe.Airframe):
         self.battery_p = 100  # 機体として正しい値は1118880(maxの7割)
         self.battery_J = 1118880
         self.takeOffTime_m = 0.5  # 離着陸にかかる時間
-        self.speed_km_m = 1.083  # 機体速度65km/h
+        self.speed_km_m = 1.167  # 機体速度70km/h
         self.maxPayload_kg = 1
         self.type = "vtol"
     
@@ -28,3 +28,6 @@ class Vtol(airframe.Airframe):
         battery = 0.309102509*addPayload_kg*distance_km/self.speed_km_m + 1.8721*addPayload_kg
 
         return battery
+    
+    def calcFlightTime(self,distance_km):
+        return distance_km/self.speed_km_m + self.takeOffTime_m

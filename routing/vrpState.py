@@ -13,7 +13,7 @@ class VrpState():
         self.droneNum = droneNum
         self.allCustomerNum = allCustomerNum
         self.miniCustomerMap = []
-        self.cost_list = [] #各フライトのdrone type, flight time, battery consumption,payloadをタプルで保持
+        self.cost_list = [] #各フライトのdrone type, flight time, battery consumption + penalty,payload,battery consumptionをタプルで保持
         self.eachFlights = [] #最終的な各ドローンのルーティング
         for i in range(droneNum):
             self.miniCustomerMap.append([])
@@ -23,7 +23,7 @@ class VrpState():
         self.change_flight_2 = None
         self.CAP_PENALTY = 30 # batteryとpayload制限を超えた場合にコストに追加するペナルティ
         self.PAYLOAD_PENALTY = 20 # payload制限超えたときにpayload%10*payload_penaltyを追加
-        self.BATTERY_PENALTY = 4 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
+        self.BATTERY_PENALTY = 5 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
         
         
     def move(self):
@@ -102,7 +102,7 @@ class VrpState():
     def calcCost(self,map_id):#TODO バッテリ消費量の単位を％からJなどに変更
         
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
-            self.cost_list[map_id] = (Airframe(),0,0,0)
+            self.cost_list[map_id] = (Airframe(),0,0,0,0)
             self.eachFlights[map_id] = []
                                            
             #print("顧客数 0")
@@ -125,6 +125,7 @@ class VrpState():
         #    self.eachFlights[map_id] = []
         #    return
         
+        #print("multi : "+str(multiBC)+", vtol : "+str(vtolBC))
         
         if sumPayload > Multi().maxPayload_kg or multiRouting.BC > 100:
             multiBC += self.CAP_PENALTY # 制限を超えている場合ペナルティを付ける
@@ -140,12 +141,12 @@ class VrpState():
             if sumPayload > Vtol().maxPayload_kg:
                 vtolBC += (sumPayload - Vtol().maxPayload_kg)*10*self.PAYLOAD_PENALTY
             
-        #if multiBC*Multi().battery_J/100 > vtolBC*Vtol().battery_J/100:
-        if multiBC > vtolBC:
-            self.cost_list[map_id] = (Vtol(),vtolRouting.FT,vtolBC,sumPayload)
+        if multiBC*Multi().battery_J/100 > vtolBC*Vtol().battery_J/100:
+        #if multiBC > vtolBC:
+            self.cost_list[map_id] = (Vtol(),vtolRouting.FT,vtolBC,sumPayload,vtolRouting.BC)
             self.eachFlights[map_id] = vtolRouting.bestRoute
         else :
-            self.cost_list[map_id] = (Multi(),multiRouting.FT,multiBC,sumPayload)
+            self.cost_list[map_id] = (Multi(),multiRouting.FT,multiBC,sumPayload,multiRouting.BC)
             self.eachFlights[map_id] = multiRouting.bestRoute
 
                                                                                         
