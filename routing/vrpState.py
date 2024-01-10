@@ -125,7 +125,7 @@ class VrpState():
         #    self.eachFlights[map_id] = []
         #    return
         
-        #print("multi : "+str(multiBC)+", vtol : "+str(vtolBC))
+        #print("multi : "+str(multiBC*Multi().battery_J/100)+", vtol : "+str(vtolBC*Vtol().battery_J/100))
         
         if sumPayload > Multi().maxPayload_kg or multiRouting.BC > 100:
             multiBC += self.CAP_PENALTY # 制限を超えている場合ペナルティを付ける

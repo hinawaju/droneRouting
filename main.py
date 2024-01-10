@@ -21,8 +21,8 @@ def main0(path,N):
     Map.criateMapFile(N,path)
     
 # 機体が各ペイロード量で何分飛行できるのか
-def main01():
-    drone1 = Multi()
+def calcFlightabelTime():
+    drone1 = Vtol()
     for i in range(11):
         BC1 = drone1.consum_f(i/10)
         print(i/10,(100-drone1.consum_h(i/10))/BC1)
@@ -321,10 +321,10 @@ def tryNtimes(N):
         mapName = "data/map"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
         #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
-        r=10
+        r=3
         #customer = random.randint(2,25)
-        customer = 10
-        main06(mapName,customer,r,p=0.2)
+        customer = 3
+        main06(mapName,customer,r,p=0.3)
         main5(mapName,droneNum=customer)
     
     #plotUsageFile("data/multiUsage")
@@ -332,8 +332,9 @@ def tryNtimes(N):
         
         
 if __name__ == "__main__":
-    #main06('data/large5.txt',N=10,r=3,p=0.2)
-    #main5('data/large5.txt',droneNum=10)
+    #main06('data/large5.txt',N=20,r=10,p=1)
+    main5('data/large5.txt',droneNum=20)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')
-    tryNtimes(10)
+    #tryNtimes(10)
+    

@@ -1,25 +1,50 @@
 drone type, distance, payload, BC
-multi copter,25.91,0.60,60.39
-multi copter,32.42,0.30,70.93
-multi copter,30.65,0.30,66.11
-multi copter,8.94,0.30,21.66
-multi copter,39.63,0.50,86.07
-multi copter,35.28,0.90,80.69
-multi copter,40.91,0.70,90.56
-multi copter,32.21,0.40,70.66
-multi copter,27.33,0.30,60.42
-multi copter,43.79,1.00,99.79
-multi copter,26.92,0.70,61.59
-multi copter,29.56,0.70,66.85
-multi copter,36.71,0.90,84.57
-multi copter,31.21,0.70,70.54
-multi copter,43.91,0.80,99.62
-multi copter,38.83,0.60,85.88
-multi copter,41.95,0.90,95.54
-multi copter,38.53,1.00,89.85
-multi copter,38.41,0.30,83.23
-multi copter,28.34,0.60,65.34
-multi copter,34.24,0.80,78.03
-multi copter,40.91,0.60,91.34
-multi copter,28.32,0.30,61.31
-multi copter,27.10,0.30,59.92
+vtol,12.66,0.80,55.47
+vtol,12.32,0.50,53.79
+vtol,10.94,0.60,50.66
+vtol,12.04,0.40,52.52
+vtol,8.83,0.40,45.03
+vtol,10.40,0.80,50.46
+vtol,12.96,0.60,55.63
+vtol,9.21,0.60,46.63
+vtol,10.64,0.80,50.90
+vtol,12.20,0.60,53.28
+vtol,10.63,0.30,49.02
+multi copter,6.65,0.30,4.90
+multi copter,7.21,0.10,4.48
+multi copter,26.69,0.40,21.80
+multi copter,22.06,0.40,17.47
+multi copter,40.89,0.50,32.24
+multi copter,33.49,0.20,21.36
+multi copter,18.35,0.40,13.53
+multi copter,46.73,0.40,34.45
+multi copter,34.58,0.40,27.27
+multi copter,32.59,0.40,23.55
+vtol,17.09,1.00,53.30
+vtol,32.11,0.90,94.80
+vtol,29.22,0.70,87.42
+vtol,24.41,0.90,70.29
+vtol,17.41,0.90,60.65
+vtol,25.85,0.40,78.26
+vtol,20.01,1.00,66.74
+vtol,8.25,0.70,31.85
+multi copter,23.84,3.90,89.52
+vtol,18.72,0.70,75.61
+vtol,28.60,0.90,86.58
+vtol,27.43,0.90,90.98
+vtol,21.37,0.90,70.01
+multi copter,17.20,0.80,19.35
+vtol,20.88,0.90,61.97
+multi copter,24.41,0.50,21.68
+multi copter,15.62,0.50,14.06
+vtol,8.25,0.70,31.85
+multi copter,20.42,0.40,16.62
+multi copter,25.46,0.70,26.40
+multi copter,21.66,0.50,16.37
+multi copter,20.59,0.60,19.92
+multi copter,20.40,0.40,16.66
+vtol,19.70,1.00,59.48
+multi copter,7.21,0.30,5.62
+multi copter,18.87,0.30,14.02
+vtol,14.47,1.00,53.66
+multi copter,17.34,0.40,14.48
