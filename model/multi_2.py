@@ -9,7 +9,8 @@ class Multi2(airframe.Airframe):
         self.takeOffTime_m = 0.5  # 離着陸にかかる時間
         self.speed_km_m = 0.6  # 機体速度10m/s
         self.maxPayload_kg = 0.5
-        self.type = "multi copter"
+        self.type = "S multi"
+        self.color = "yellow"
 
     # 前進飛行での1分あたりの消費電力割合（％/分)
     def consum_f(self,payload_kg):

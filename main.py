@@ -7,6 +7,8 @@ from routing.doubleDroneRouting import DoubleDR
 from routing.vrp import VRP
 from model.multicopter import Multi
 from model.vtol import Vtol
+from model.largeMulti import LargeMulti
+from model.smollMulti import SmollMulti
 from field.map import Map
 #import openpyxl
 from matplotlib import pyplot
@@ -166,11 +168,11 @@ def main4(mapFilePath):
     print("BC",tsp.BC,"FT",tsp.FT)
     
 #3機以上のドローンで
-def main5(mapFilePath,droneNum):
+def main5(mapFilePath,droneNum, droneList):
     map = Map(mapFilePath)
     customerList = map.customerList
     #初期解作成
-    initial_state = VrpState(droneNum,map.CN)
+    initial_state = VrpState(droneNum,droneList,map.CN)
     i = 0
     for c in customerList:
         initial_state.miniCustomerMap[i].append(c)
@@ -200,34 +202,38 @@ def main5(mapFilePath,droneNum):
     f = open('data/result.txt','a')
     #f.write("drone type, distance, payload, BC"+"\n")
     
-    #for i in range(droneNum):
-    #    if len(state[0].eachFlights[i])==0:
-    #        continue
-    #    print("[",end=" ")
-    #    for n in state[0].eachFlights[i]:
-    #    print(n.nodeNum,end=", ")
-    #    print("]",state[0].cost_list[i][0].type,"FT",format(state[0].cost_list[i][1],'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'),"payload",format(state[0].cost_list[i][3],'.2f'))
-    
-    #state[0].plotRouteFig()
-    
-    
-    #分析用
-    vtolUsage = 0
-    multiUsage = 0
-    usedDrone = droneNum
+    """
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
-            usedDrone -= 1
+            continue
+        print("[",end=" ")
+        for n in state[0].eachFlights[i]:
+        print(n.nodeNum,end=", ")
+        print("]",state[0].cost_list[i][0].type,"FT",format(state[0].cost_list[i][1],'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'),"payload",format(state[0].cost_list[i][3],'.2f'))
+    
+    state[0].plotRouteFig()
+    """
+    
+    #分析用
+    #vtolUsage = 0
+    #multiUsage = 0
+    #usedDrone = droneNum
+    for i in range(droneNum):
+        if len(state[0].eachFlights[i])==0:
+            #usedDrone -= 1
             continue
         d = 0
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
         print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][4],'.2f'))
         f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][4],'.2f'))+"\n")
+        
+        """
         if state[0].cost_list[i][0].type == "multi copter":
             multiUsage += 1
         elif state[0].cost_list[i][0].type == "vtol":
             vtolUsage += 1
+        """
     f.close
     """
     f_m = open("data/multiUsage","a")
@@ -256,8 +262,10 @@ def plotResultFile(path):
         payload = float(flightResultList[1])
         distance = float(flightResultList[2])
     
-        if flightResultList[0] == "multi copter":
-            ax.plot(*[payload,distance], 'o', color="red")
+        if flightResultList[0] == "S multi":
+            ax.plot(*[payload,distance], 'o', color="yellow")
+        elif flightResultList[0] == "L multi":
+            ax.plot(*[payload,distance], 'o', color="green")
         elif flightResultList[0] == "vtol":
             ax.plot(*[payload,distance], 'o', color="blue")
         
@@ -268,7 +276,8 @@ def plotResultFile(path):
     ax.grid(axis="both")
     
     pyplot.show()
-        
+
+"""
 def plotUsageFile(path):
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
@@ -300,6 +309,7 @@ def plotUsageFile(path):
     cbar.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(10))
     
     pyplot.show()
+"""
     
 def tryNtimes(N):
     """
@@ -332,8 +342,9 @@ def tryNtimes(N):
         
         
 if __name__ == "__main__":
-    #main06('data/large5.txt',N=20,r=10,p=1)
-    main5('data/large5.txt',droneNum=20)
+    droneList = [Vtol(),SmollMulti(),LargeMulti()]
+    main06('data/large1.txt',N=10,r=10,p=1)
+    main5('data/large1.txt',droneNum=10,droneList=droneList)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')
     #tryNtimes(10)

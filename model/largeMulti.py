@@ -1,6 +1,6 @@
 from . import airframe
 
-class Multi1(airframe.Airframe):
+class LargeMulti(airframe.Airframe):
     # large drone
     def __init__(self):
         super().__init__()
