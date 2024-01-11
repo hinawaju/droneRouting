@@ -14,7 +14,7 @@ class VrpState():
         self.droneList = droneList
         self.allCustomerNum = allCustomerNum
         self.miniCustomerMap = []
-        self.cost_list = [] #各フライトのdrone type, flight time, battery consumption + penalty,payload,battery consumptionをタプルで保持
+        self.cost_list = [] #各フライトのdroneType, flightTime, batteryConsumption+Penalty, payload, battery consumptionをタプルで保持
         self.eachFlights = [] #最終的な各ドローンのルーティング
         for i in range(droneNum):
             self.miniCustomerMap.append([])
@@ -24,7 +24,7 @@ class VrpState():
         self.change_flight_2 = None
         self.CAP_PENALTY = 30 # batteryとpayload制限を超えた場合にコストに追加するペナルティ
         self.PAYLOAD_PENALTY = 20 # payload制限超えたときにpayload%10*payload_penaltyを追加
-        self.BATTERY_PENALTY = 5 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
+        self.BATTERY_PENALTY = 10 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
         
         
     def move(self):
@@ -96,12 +96,11 @@ class VrpState():
     def calcScore(self):#TODO バッテリ消費量の単位を％からJなどに変更
         sum_BC = 0
         for touple in self.cost_list:
-            sum_BC += touple[2]
+            sum_BC += touple[2]/100*touple[0].battery_J
         
         return sum_BC
     
     def calcCost(self,map_id):#TODO バッテリ消費量の単位を％からJなどに変更
-        #TODO droneList にはMulti()とかを格納
         
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
             self.cost_list[map_id] = (Airframe(),0,0,0,0)
@@ -112,7 +111,8 @@ class VrpState():
             return
         
         eachDroneBCList = []
-        penaltyBCList = []
+        penaltyBCList_p = []
+        penaltyBCList_J = []
         for drone in self.droneList:
             routing = SingleRouting(self.miniCustomerMap[map_id],drone,self.allCustomerNum)
             routing.criateTBobjectB()
@@ -131,16 +131,17 @@ class VrpState():
         #print("multi : "+str(multiBC*Multi().battery_J/100)+", vtol : "+str(vtolBC*Vtol().battery_J/100))
         
         for i in range(len(self.droneList)):
-            penaltyBCList.append(eachDroneBCList[i][0])
+            penaltyBCList_p.append(eachDroneBCList[i][0])
             if sumPayload > self.droneList[i].maxPayload_kg or eachDroneBCList[i][0] > 100:
-                penaltyBCList[i] += self.CAP_PENALTY
+                penaltyBCList_p[i] += self.CAP_PENALTY
                 if eachDroneBCList[i][0] > 100:
-                    penaltyBCList[i] += (eachDroneBCList[i][0]-100)*self.BATTERY_PENALTY
+                    penaltyBCList_p[i] += (eachDroneBCList[i][0]-100)*self.BATTERY_PENALTY
                 if sumPayload > self.droneList[i].maxPayload_kg:
-                    penaltyBCList[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
+                    penaltyBCList_p[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
+            penaltyBCList_J.append(penaltyBCList_p[i]/100*self.droneList[i].battery_J)
             
-        minIndex = penaltyBCList.index(min(penaltyBCList))
-        self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[i][1],penaltyBCList[minIndex],sumPayload,eachDroneBCList[i][0])
+        minIndex = penaltyBCList_J.index(min(penaltyBCList_J))
+        self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[i][1],penaltyBCList_p[minIndex],sumPayload,eachDroneBCList[i][0])
         self.eachFlights[map_id] = eachDroneBCList[i][2]
 
                                                                                         
