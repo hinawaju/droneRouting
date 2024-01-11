@@ -10,11 +10,11 @@ class SmollMulti(airframe.Airframe):
         self.speed_km_m = 0.6  # 機体速度10m/s
         self.maxPayload_kg = 0.5
         self.type = "S multi"
-        self.color = "yellow"
+        self.color = "gold"
 
     # 前進飛行での1分あたりの消費電力割合（％/分)
     def consum_f(self,payload_kg):
-        return 0.88*payload_kg + 0.3
+        return 1.11*payload_kg + 3.5
         
     # 離着陸１回あたりでのバッテリー消費割合（％）
     def consum_h(self,payload_kg):
@@ -24,7 +24,7 @@ class SmollMulti(airframe.Airframe):
         return self.consum_f(payload_kg)*distance_km/self.speed_km_m + self.consum_h(payload_kg)
 
     def addPayloadBC(self,distance_km,addPayload_kg):
-        return 0.88*addPayload_kg * distance_km/self.speed_km_m + 0.88*addPayload_kg * self.takeOffTime_m
+        return 1.11*addPayload_kg * distance_km/self.speed_km_m + 1.11*addPayload_kg * self.takeOffTime_m
 
     def calcFlightTime(self,distance_km):
         return distance_km/self.speed_km_m + self.takeOffTime_m

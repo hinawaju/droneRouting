@@ -14,7 +14,7 @@ class LargeMulti(airframe.Airframe):
 
     # 前進飛行での1分あたりの消費電力割合（％/分)
     def consum_f(self,payload_kg):
-        return 0.072*payload_kg + 2.5
+        return 0.09*payload_kg + 3.16
     
     # 離着陸１回あたりでのバッテリー消費割合（％）
     def consum_h(self,payload_kg):
@@ -24,7 +24,7 @@ class LargeMulti(airframe.Airframe):
         return self.consum_f(payload_kg)*distance_km/self.speed_km_m + self.consum_h(payload_kg)
 
     def addPayloadBC(self,distance_km,addPayload_kg):
-        return 0.072*addPayload_kg * distance_km/self.speed_km_m + 0.072*addPayload_kg * self.takeOffTime_m
+        return 0.09*addPayload_kg * distance_km/self.speed_km_m + 0.09*addPayload_kg * self.takeOffTime_m
 
     def calcFlightTime(self,distance_km):
         return distance_km/self.speed_km_m + self.takeOffTime_m

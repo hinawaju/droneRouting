@@ -24,8 +24,8 @@ def main0(path,N):
     
 # 機体が各ペイロード量で何分飛行できるのか
 def calcFlightabelTime():
-    drone1 = Vtol()
-    for i in range(11):
+    drone1 = SmollMulti()
+    for i in range(6):
         BC1 = drone1.consum_f(i/10)
         print(i/10,(100-drone1.consum_h(i/10))/BC1)
     
@@ -226,7 +226,7 @@ def main5(mapFilePath,droneNum, droneList):
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
         print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][4],'.2f'))
-        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][4],'.2f'))+"\n")
+        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][4],'.2f'))+","+str(len(state[0].eachFlights[i])-2)+"\n")
         
         """
         if state[0].cost_list[i][0].type == "multi copter":
@@ -253,6 +253,15 @@ def plotResultFile(path):
     f = open(path,'r')
     next(f) #  ファイルの2行目から読み込み
     
+    SMultiP = []
+    SMultiD = []
+    SMultiC = []
+    LMultiP = []
+    LMultiD = []
+    LMultiC = []
+    vtolP = []
+    vtolD = []
+    vtolC = []
     while True: #  マップのファイルから顧客リストを作成
         flightStr = f.readline() #  ファイルから1行読む
         if flightStr == '': #  EOFになったら終了
@@ -261,16 +270,38 @@ def plotResultFile(path):
         flightResultList = flightStr.split(',')
         payload = float(flightResultList[1])
         distance = float(flightResultList[2])
+        customerAmount = str(flightResultList[4])
     
         if flightResultList[0] == "S multi":
-            ax.plot(*[payload,distance], 'o', color="yellow")
+            SMultiP.append(payload)
+            SMultiD.append(distance)
+            SMultiC.append(customerAmount)
         elif flightResultList[0] == "L multi":
-            ax.plot(*[payload,distance], 'o', color="green")
+            LMultiP.append(payload)
+            LMultiD.append(distance)
+            LMultiC.append(customerAmount)
         elif flightResultList[0] == "vtol":
-            ax.plot(*[payload,distance], 'o', color="blue")
+            vtolP.append(payload)
+            vtolD.append(distance)
+            vtolC.append(customerAmount)
         
-    ax.set_xlim([0, 35])
-    ax.set_ylim([0, 1.2])
+    ax.plot(*[SMultiP,SMultiD], 'o', color="gold", label = "S multi")
+    ax.plot(*[LMultiP,LMultiD], 'o', color="green", label = "L multi")
+    ax.plot(*[vtolP,vtolD], 'o', color="blue", label = "vtol")
+    ax.legend()
+    
+    """
+    #顧客数をグラフにプロット
+    for i in range(len(SMultiP)):
+        ax.text(SMultiP[i],SMultiD[i],SMultiC[i])
+    for j in range(len(LMultiP)):
+        ax.text(LMultiP[j],LMultiD[j],LMultiC[j])
+    for k in range(len(vtolP)):
+        ax.text(vtolP[k],vtolD[k],vtolC[k])
+    """
+    
+    #ax.set_xlim([0, 35])
+    #ax.set_ylim([0, 7])
     ax.set_xlabel("flight distance(km)")
     ax.set_ylabel("payload(kg)")
     ax.grid(axis="both")
@@ -311,7 +342,7 @@ def plotUsageFile(path):
     pyplot.show()
 """
     
-def tryNtimes(N):
+def tryNtimes(N,droneList):
     """
     #結果出力に必要な３つのファイルを初期化
     f_r = open('data/result.txt','w')
@@ -331,11 +362,11 @@ def tryNtimes(N):
         mapName = "data/map"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
         #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
-        r=3
+        r=10
         #customer = random.randint(2,25)
-        customer = 3
-        main06(mapName,customer,r,p=0.3)
-        main5(mapName,droneNum=customer)
+        customer = 10
+        #main06(mapName,customer,r,p=1)
+        main5(mapName,droneNum=customer,droneList=droneList)
     
     #plotUsageFile("data/multiUsage")
     plotResultFile('data/result.txt')
@@ -343,9 +374,10 @@ def tryNtimes(N):
         
 if __name__ == "__main__":
     droneList = [Vtol(),SmollMulti(),LargeMulti()]
-    main06('data/large1.txt',N=10,r=10,p=1)
-    main5('data/large1.txt',droneNum=10,droneList=droneList)
+    main06('data/large2.txt',N=10,r=3,p=0.2)
+    main5('data/large2.txt',droneNum=10,droneList=droneList)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')
-    #tryNtimes(10)
+    #tryNtimes(10,droneList)
+    #calcFlightabelTime()
     
