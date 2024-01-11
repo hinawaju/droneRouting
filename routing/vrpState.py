@@ -9,8 +9,9 @@ from matplotlib import pyplot
 
 class VrpState():
     
-    def __init__(self,droneNum,allCustomerNum) -> None:
+    def __init__(self,droneNum,droneList,allCustomerNum) -> None:
         self.droneNum = droneNum
+        self.droneList = droneList
         self.allCustomerNum = allCustomerNum
         self.miniCustomerMap = []
         self.cost_list = [] #各フライトのdrone type, flight time, battery consumption + penalty,payload,battery consumptionをタプルで保持
@@ -100,6 +101,7 @@ class VrpState():
         return sum_BC
     
     def calcCost(self,map_id):#TODO バッテリ消費量の単位を％からJなどに変更
+        #TODO droneList にはMulti()とかを格納
         
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
             self.cost_list[map_id] = (Airframe(),0,0,0,0)
@@ -108,17 +110,18 @@ class VrpState():
             #print("顧客数 0")
                                            
             return
-            
-        multiRouting = SingleRouting(self.miniCustomerMap[map_id],Multi(),self.allCustomerNum)
-        multiRouting.criateTBobjectB()
-        multiRouting.searchBestRouteObjectB()
-        vtolRouting = SingleRouting(self.miniCustomerMap[map_id],Vtol(),self.allCustomerNum)
-        vtolRouting.criateTBobjectB()
-        vtolRouting.searchBestRouteObjectB()
         
-        multiBC = multiRouting.BC
-        vtolBC = vtolRouting.BC
-        sumPayload = multiRouting.checkSumDemand()
+        eachDroneBCList = []
+        penaltyBCList = []
+        for drone in self.droneList:
+            routing = SingleRouting(self.miniCustomerMap[map_id],drone,self.allCustomerNum)
+            routing.criateTBobjectB()
+            routing.searchBestRouteObjectB()
+            eachDroneBCList.append((routing.BC, routing.FT, routing.bestRoute))
+        
+        sumPayload = 0
+        for c in self.miniCustomerMap[map_id]:
+            sumPayload += c.demand
         
         #if len(self.miniCustomerMap[map_id]) >= 12:# １顧客につき最低0.1kgの荷物を運ぶので、制限内で配達できる顧客数は最大10カ所である。焼きなまし法なのである程度制限を超える可能性を残して11顧客まで許容する
         #    self.cost_list[map_id] = (Airframe(),float("inf"),300+2*self.PAYLOAD_PENALTY*len(self.miniCustomerMap[map_id]),sumPayload)
@@ -127,27 +130,18 @@ class VrpState():
         
         #print("multi : "+str(multiBC*Multi().battery_J/100)+", vtol : "+str(vtolBC*Vtol().battery_J/100))
         
-        if sumPayload > Multi().maxPayload_kg or multiRouting.BC > 100:
-            multiBC += self.CAP_PENALTY # 制限を超えている場合ペナルティを付ける
-            if multiRouting.BC > 100:
-                multiBC += (multiRouting.BC-100)*self.BATTERY_PENALTY
-            if sumPayload > Multi().maxPayload_kg:
-                multiBC += (sumPayload - Multi().maxPayload_kg)*10*self.PAYLOAD_PENALTY # payload制限を超えている場合さらにペナルティをつける
-
-        if sumPayload > Vtol().maxPayload_kg or vtolRouting.BC > 100:
-            vtolBC += self.CAP_PENALTY
-            if vtolRouting.BC > 100:
-                vtolBC += (vtolRouting.BC-100)*self.BATTERY_PENALTY
-            if sumPayload > Vtol().maxPayload_kg:
-                vtolBC += (sumPayload - Vtol().maxPayload_kg)*10*self.PAYLOAD_PENALTY
+        for i in range(len(self.droneList)):
+            penaltyBCList.append(eachDroneBCList[i][0])
+            if sumPayload > self.droneList[i].maxPayload_kg or eachDroneBCList[i][0] > 100:
+                penaltyBCList[i] += self.CAP_PENALTY
+                if eachDroneBCList[i][0] > 100:
+                    penaltyBCList[i] += (eachDroneBCList[i][0]-100)*self.BATTERY_PENALTY
+                if sumPayload > self.droneList[i].maxPayload_kg:
+                    penaltyBCList[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
             
-        if multiBC*Multi().battery_J/100 > vtolBC*Vtol().battery_J/100:
-        #if multiBC > vtolBC:
-            self.cost_list[map_id] = (Vtol(),vtolRouting.FT,vtolBC,sumPayload,vtolRouting.BC)
-            self.eachFlights[map_id] = vtolRouting.bestRoute
-        else :
-            self.cost_list[map_id] = (Multi(),multiRouting.FT,multiBC,sumPayload,multiRouting.BC)
-            self.eachFlights[map_id] = multiRouting.bestRoute
+        minIndex = penaltyBCList.index(min(penaltyBCList))
+        self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[i][1],penaltyBCList[minIndex],sumPayload,eachDroneBCList[i][0])
+        self.eachFlights[map_id] = eachDroneBCList[i][2]
 
                                                                                         
         #print("顧客数",len(self.miniCustomerMap[map_id]),"payload",sumPayload)
@@ -157,12 +151,13 @@ class VrpState():
         fig = pyplot.figure()
         ax = fig.add_subplot(111)
 
-        ax.plot(*[0,0], 'o', color="blue") #  デポのプロット
+        ax.plot(*[0,0], 'o', color="black") #  デポのプロット
         for map in self.miniCustomerMap:
             for n in map:
                 ax.plot(*[n.x,n.y], 'o', color="red")
                 ax.text(n.x, n.y,n.demand)
 
+        """
         for flight in self.eachFlights:
             for i in range(len(flight)-1): # 矢印のプロット
                 fromNode = flight[i]
@@ -172,14 +167,11 @@ class VrpState():
                                             headlength=10, connectionstyle='arc3',
                                             facecolor='gray', edgecolor='gray')
                             )
+        """
+        
         for i in range(len(self.eachFlights)):
             # 機体によってベクトルを色分け
-            if self.cost_list[i][0].type == "multi copter":
-                color = "green"
-            elif self.cost_list[i][0].type == "vtol":
-                color = "blue"
-            else :
-                color = "gray"
+            color = self.cost_list[i][0].color
 
             for j in range(len(self.eachFlights[i])-1):
                 fromNode = self.eachFlights[i][j]
