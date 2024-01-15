@@ -127,8 +127,7 @@ class VrpState():
                     maxBC = routing.BC
                     minIndex = index
                 index += 1
-            else:
-                index += 1
+            
         
         """
         #評価値のBCにペナルティをつける。制約をつけた状態だと不要
@@ -142,7 +141,6 @@ class VrpState():
                     penaltyBCList_p[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
             penaltyBCList_J.append(penaltyBCList_p[i]/100*self.droneList[i].battery_J)
         """    
-        
         if len(eachDroneBCList) != 0 and eachDroneBCList[minIndex][0] < 100 :
             self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[minIndex][1],eachDroneBCList[minIndex][0],sumPayload)
             self.eachFlights[map_id] = eachDroneBCList[minIndex][2]

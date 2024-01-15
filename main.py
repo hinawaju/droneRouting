@@ -375,8 +375,8 @@ def tryNtimes(N,droneList):
         
         
 if __name__ == "__main__":
-    droneList = [Vtol(),SmollMulti()]
-    #main06('data/large4.txt',N=10,r=12,p=2)
+    droneList = [Vtol(),SmollMulti(),LargeMulti()]
+    #main06('data/large4.txt',N=10,r=12,p=1)
     main5('data/large4.txt',droneNum=10,droneList=droneList)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')
