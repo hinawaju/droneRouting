@@ -202,7 +202,7 @@ def main5(mapFilePath,droneNum, droneList):
     f = open('data/result.txt','a')
     #f.write("drone type, distance, payload, BC"+"\n")
     
-    
+    """
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
             continue
@@ -211,7 +211,7 @@ def main5(mapFilePath,droneNum, droneList):
             print(n.nodeNum,end=", ")
         print("]",state[0].cost_list[i][0].type,"FT",format(state[0].cost_list[i][1],'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'),"payload",format(state[0].cost_list[i][3],'.2f'))
     
-    state[0].plotRouteFig()
+    #state[0].plotRouteFig()
     """
     
     #分析用
@@ -236,7 +236,7 @@ def main5(mapFilePath,droneNum, droneList):
         #    vtolUsage += 1
         
     f.close
-    """
+    
     """
     f_m = open("data/multiUsage","a")
     f_m.write(str(2*map.r)+","+str(map.CN)+","+str(multiUsage/usedDrone *100)+",\n")
@@ -364,10 +364,10 @@ def tryNtimes(N,droneList):
         mapName = "data/map"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
         #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
-        r=10
+        r=12
         #customer = random.randint(2,25)
         customer = 10
-        #main06(mapName,customer,r,p=1)
+        main06(mapName,customer,r,p=1.5)
         main5(mapName,droneNum=customer,droneList=droneList)
     
     #plotUsageFile("data/multiUsage")
@@ -376,7 +376,7 @@ def tryNtimes(N,droneList):
         
 if __name__ == "__main__":
     droneList = [Vtol(),SmollMulti(),LargeMulti()]
-    #main06('data/large4.txt',N=10,r=12,p=1)
+    main06('data/large4.txt',N=10,r=7,p=1.5)
     main5('data/large4.txt',droneNum=10,droneList=droneList)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')

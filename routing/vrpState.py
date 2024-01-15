@@ -104,9 +104,6 @@ class VrpState():
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
             self.cost_list[map_id] = (Airframe(),0,0,0)
             self.eachFlights[map_id] = []
-                                           
-            #print("顧客数 0")
-                                           
             return
         
         sumPayload = 0
@@ -122,12 +119,12 @@ class VrpState():
                 routing = SingleRouting(self.miniCustomerMap[map_id],drone,self.allCustomerNum)
                 routing.criateTBobjectB()
                 routing.searchBestRouteObjectB()
-                eachDroneBCList.append((routing.BC, routing.FT, routing.bestRoute))
+                eachDroneBCList.append((drone,routing.BC, routing.FT, routing.bestRoute))
+                
                 if maxBC > routing.BC:
                     maxBC = routing.BC
                     minIndex = index
                 index += 1
-            
         
         """
         #評価値のBCにペナルティをつける。制約をつけた状態だと不要
@@ -141,11 +138,11 @@ class VrpState():
                     penaltyBCList_p[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
             penaltyBCList_J.append(penaltyBCList_p[i]/100*self.droneList[i].battery_J)
         """    
-        if len(eachDroneBCList) != 0 and eachDroneBCList[minIndex][0] < 100 :
-            self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[minIndex][1],eachDroneBCList[minIndex][0],sumPayload)
-            self.eachFlights[map_id] = eachDroneBCList[minIndex][2]
+        if len(eachDroneBCList) != 0 and eachDroneBCList[minIndex][1] < 100 :
+            self.cost_list[map_id] = (eachDroneBCList[minIndex][0],eachDroneBCList[minIndex][2],eachDroneBCList[minIndex][1],sumPayload)
+            self.eachFlights[map_id] = eachDroneBCList[minIndex][3]
         else:
-            self.cost_list[map_id] = (Airframe(), 0, 100*(len(self.miniCustomerMap[map_id])),0)
+            self.cost_list[map_id] = (Airframe(), 0, 100*(len(self.miniCustomerMap[map_id])),sumPayload)
             self.eachFlights[map_id] = []
 
                                                                                         
