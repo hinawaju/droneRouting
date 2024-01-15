@@ -24,8 +24,8 @@ def main0(path,N):
     
 # 機体が各ペイロード量で何分飛行できるのか
 def calcFlightabelTime():
-    drone1 = SmollMulti()
-    for i in range(6):
+    drone1 = Vtol()
+    for i in range(11):
         BC1 = drone1.consum_f(i/10)
         print(i/10,(100-drone1.consum_h(i/10))/BC1)
     
@@ -184,13 +184,13 @@ def main5(mapFilePath,droneNum, droneList):
         initial_state.calcCost(j)
 
     # 初期解表示
-    """
+    
     for i in range(droneNum):
         print("[",end=" ")
         for n in initial_state.eachFlights[i]:
             print(n.nodeNum,end=", ")
         print("]",initial_state.cost_list[i][0].type,"FT",format(initial_state.cost_list[i][1],'.2f'),"BC",format(initial_state.cost_list[i][2],'.2f'),"payload",format(initial_state.cost_list[i][3],'.2f'))
-    """
+    
     
     vrp = VRP(initial_state)
 
@@ -202,13 +202,13 @@ def main5(mapFilePath,droneNum, droneList):
     f = open('data/result.txt','a')
     #f.write("drone type, distance, payload, BC"+"\n")
     
-    """
+    
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
             continue
         print("[",end=" ")
         for n in state[0].eachFlights[i]:
-        print(n.nodeNum,end=", ")
+            print(n.nodeNum,end=", ")
         print("]",state[0].cost_list[i][0].type,"FT",format(state[0].cost_list[i][1],'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'),"payload",format(state[0].cost_list[i][3],'.2f'))
     
     state[0].plotRouteFig()
@@ -218,6 +218,7 @@ def main5(mapFilePath,droneNum, droneList):
     #vtolUsage = 0
     #multiUsage = 0
     #usedDrone = droneNum
+    
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
             #usedDrone -= 1
@@ -225,16 +226,17 @@ def main5(mapFilePath,droneNum, droneList):
         d = 0
         for j in range(len(state[0].eachFlights[i])-1):
             d += map.distance2(state[0].eachFlights[i][j],state[0].eachFlights[i][j+1])
-        print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][4],'.2f'))
-        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][4],'.2f'))+","+str(len(state[0].eachFlights[i])-2)+"\n")
+        print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'))
+        f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+","+str(len(state[0].eachFlights[i])-2)+"\n")
         
-        """
-        if state[0].cost_list[i][0].type == "multi copter":
-            multiUsage += 1
-        elif state[0].cost_list[i][0].type == "vtol":
-            vtolUsage += 1
-        """
+        
+        #if state[0].cost_list[i][0].type == "multi copter":
+        #    multiUsage += 1
+        #elif state[0].cost_list[i][0].type == "vtol":
+        #    vtolUsage += 1
+        
     f.close
+    """
     """
     f_m = open("data/multiUsage","a")
     f_m.write(str(2*map.r)+","+str(map.CN)+","+str(multiUsage/usedDrone *100)+",\n")
@@ -373,9 +375,9 @@ def tryNtimes(N,droneList):
         
         
 if __name__ == "__main__":
-    droneList = [Vtol(),SmollMulti(),LargeMulti()]
-    main06('data/large3.txt',N=10,r=10,p=2)
-    main5('data/large3.txt',droneNum=10,droneList=droneList)
+    droneList = [Vtol(),LargeMulti(),SmollMulti()]
+    #main06('data/large4.txt',N=10,r=15,p=0.2)
+    main5('data/large4.txt',droneNum=10,droneList=droneList)
     #plotUsageFile("data/multiUsage")
     #plotResultFile('data/result.txt')
     #tryNtimes(10,droneList)

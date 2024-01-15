@@ -14,7 +14,7 @@ class VrpState():
         self.droneList = droneList
         self.allCustomerNum = allCustomerNum
         self.miniCustomerMap = []
-        self.cost_list = [] #各フライトのdroneType, flightTime, batteryConsumption+Penalty, payload, battery consumptionをタプルで保持
+        self.cost_list = [] #各フライトのdroneType, flightTime, batteryConsumption, payloadをタプルで保持
         self.eachFlights = [] #最終的な各ドローンのルーティング
         for i in range(droneNum):
             self.miniCustomerMap.append([])
@@ -89,7 +89,6 @@ class VrpState():
         if done == True:
             self.calcCost(self.change_flight_1)
             self.calcCost(self.change_flight_2)
-
         else:
             return
         
@@ -97,13 +96,13 @@ class VrpState():
         sum_BC = 0
         for touple in self.cost_list:
             sum_BC += touple[2]/100*touple[0].battery_J
-        
+            
         return sum_BC
     
     def calcCost(self,map_id):#TODO バッテリ消費量の単位を％からJなどに変更
         
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
-            self.cost_list[map_id] = (Airframe(),0,0,0,0)
+            self.cost_list[map_id] = (Airframe(),0,0,0)
             self.eachFlights[map_id] = []
                                            
             #print("顧客数 0")
@@ -111,25 +110,29 @@ class VrpState():
             return
         
         eachDroneBCList = []
-        penaltyBCList_p = []
-        penaltyBCList_J = []
+        #penaltyBCList_p = []
+        #penaltyBCList_J = []
+        maxBC = float('inf')
+        minIndex = 0
+        index = 0
         for drone in self.droneList:
             routing = SingleRouting(self.miniCustomerMap[map_id],drone,self.allCustomerNum)
             routing.criateTBobjectB()
             routing.searchBestRouteObjectB()
             eachDroneBCList.append((routing.BC, routing.FT, routing.bestRoute))
+            if maxBC > routing.BC:
+                maxBC = routing.BC
+                minIndex = index
+                
+            #print(str(self.droneList[index].type)+":",routing.BC*self.droneList[index].battery_J/100)
+            index += 1
         
         sumPayload = 0
         for c in self.miniCustomerMap[map_id]:
             sumPayload += c.demand
         
-        #if len(self.miniCustomerMap[map_id]) >= 12:# １顧客につき最低0.1kgの荷物を運ぶので、制限内で配達できる顧客数は最大10カ所である。焼きなまし法なのである程度制限を超える可能性を残して11顧客まで許容する
-        #    self.cost_list[map_id] = (Airframe(),float("inf"),300+2*self.PAYLOAD_PENALTY*len(self.miniCustomerMap[map_id]),sumPayload)
-        #    self.eachFlights[map_id] = []
-        #    return
-        
-        #print("multi : "+str(multiBC*Multi().battery_J/100)+", vtol : "+str(vtolBC*Vtol().battery_J/100))
-        
+        """
+        #評価値のBCにペナルティをつける。制約をつけた状態だと不要
         for i in range(len(self.droneList)):
             penaltyBCList_p.append(eachDroneBCList[i][0])
             if sumPayload > self.droneList[i].maxPayload_kg or eachDroneBCList[i][0] > 100:
@@ -139,10 +142,14 @@ class VrpState():
                 if sumPayload > self.droneList[i].maxPayload_kg:
                     penaltyBCList_p[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
             penaltyBCList_J.append(penaltyBCList_p[i]/100*self.droneList[i].battery_J)
-            
-        minIndex = penaltyBCList_J.index(min(penaltyBCList_J))
-        self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[i][1],penaltyBCList_p[minIndex],sumPayload,eachDroneBCList[i][0])
-        self.eachFlights[map_id] = eachDroneBCList[i][2]
+        """    
+        
+        if eachDroneBCList[minIndex][0] < 100:
+            self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[minIndex][1],eachDroneBCList[minIndex][0],sumPayload)
+            self.eachFlights[map_id] = eachDroneBCList[minIndex][2]
+        else:
+            self.cost_list[map_id] = (Airframe(), 0, 100*(len(eachDroneBCList[minIndex][2])-2),0)
+            self.eachFlights[map_id] = eachDroneBCList[minIndex][2]
 
                                                                                         
         #print("顧客数",len(self.miniCustomerMap[map_id]),"payload",sumPayload)
