@@ -109,27 +109,26 @@ class VrpState():
                                            
             return
         
+        sumPayload = 0
+        for c in self.miniCustomerMap[map_id]:
+            sumPayload += c.demand
+        
         eachDroneBCList = []
-        #penaltyBCList_p = []
-        #penaltyBCList_J = []
         maxBC = float('inf')
         minIndex = 0
         index = 0
         for drone in self.droneList:
-            routing = SingleRouting(self.miniCustomerMap[map_id],drone,self.allCustomerNum)
-            routing.criateTBobjectB()
-            routing.searchBestRouteObjectB()
-            eachDroneBCList.append((routing.BC, routing.FT, routing.bestRoute))
-            if maxBC > routing.BC:
-                maxBC = routing.BC
-                minIndex = index
-                
-            #print(str(self.droneList[index].type)+":",routing.BC*self.droneList[index].battery_J/100)
-            index += 1
-        
-        sumPayload = 0
-        for c in self.miniCustomerMap[map_id]:
-            sumPayload += c.demand
+            if drone.maxPayload_kg > sumPayload:
+                routing = SingleRouting(self.miniCustomerMap[map_id],drone,self.allCustomerNum)
+                routing.criateTBobjectB()
+                routing.searchBestRouteObjectB()
+                eachDroneBCList.append((routing.BC, routing.FT, routing.bestRoute))
+                if maxBC > routing.BC:
+                    maxBC = routing.BC
+                    minIndex = index
+                index += 1
+            else:
+                index += 1
         
         """
         #評価値のBCにペナルティをつける。制約をつけた状態だと不要
@@ -144,12 +143,12 @@ class VrpState():
             penaltyBCList_J.append(penaltyBCList_p[i]/100*self.droneList[i].battery_J)
         """    
         
-        if eachDroneBCList[minIndex][0] < 100:
+        if len(eachDroneBCList) != 0 and eachDroneBCList[minIndex][0] < 100 :
             self.cost_list[map_id] = (self.droneList[minIndex],eachDroneBCList[minIndex][1],eachDroneBCList[minIndex][0],sumPayload)
             self.eachFlights[map_id] = eachDroneBCList[minIndex][2]
         else:
-            self.cost_list[map_id] = (Airframe(), 0, 100*(len(eachDroneBCList[minIndex][2])-2),0)
-            self.eachFlights[map_id] = eachDroneBCList[minIndex][2]
+            self.cost_list[map_id] = (Airframe(), 0, 100*(len(self.miniCustomerMap[map_id])),0)
+            self.eachFlights[map_id] = []
 
                                                                                         
         #print("顧客数",len(self.miniCustomerMap[map_id]),"payload",sumPayload)
