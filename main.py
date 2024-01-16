@@ -74,8 +74,8 @@ def main05(nodeList):
     pyplot.show()
     
 # 広いマップ作成
-def main06(path,N,r,p):
-    Map.criateLargeMapFile(N,r,p,path)
+def main06(path,N,r,min_p,max_p):
+    Map.criateLargeMapFile(N,r,min_p,max_p,path)
     
 # 制限の範囲内での1機体でのルーティング
 def main1(mapPath):
@@ -172,8 +172,6 @@ def main4(mapFilePath):
 def main5(mapFilePath,droneNum, droneList):
     map = Map(mapFilePath)
     customerList = map.customerList
-    sumDemand = map.calcSumDemand()
-    avePayload = sumDemand/map.CN
     
     #初期解作成
     initial_state = VrpState(droneNum,droneList,map.CN)
@@ -230,10 +228,13 @@ def main5(mapFilePath,droneNum, droneList):
         
     f.close
     
+    sumDemand = map.calcSumDemand()
+    avePayload = sumDemand/map.CN
+    aveDepoDistance = map.calcDepoDistanceAve
     #TODO state[1]には実行不可能解のペナルティ付きBCも含まれるので不適切
     sumBC = state[0].calcSumBC()
     f_BC = open("data/__BC","a")
-    f_BC.write(str(2*map.r)+","+str(avePayload)+","+str(sumBC)+","+str(impCustomer)+",\n")
+    f_BC.write(str(aveDepoDistance)+","+str(avePayload)+","+str(sumBC)+","+str(impCustomer)+",\n")
     f_BC.close
     
 
@@ -337,41 +338,27 @@ def plotBCFile(path):
 
     
 def tryNtimes(N,droneList):
-    """
-    #結果出力に必要な３つのファイルを初期化
-    f_r = open('data/result.txt','w')
-    f_r.write("drone type, distance, payload, BC\n")
-    f_r.close
-    
-    f_m = open('data/multiUsage','w')
-    f_m.write("2r,customer number,usage(%)\n")
-    f_m.close
-    
-    f_v = open('data/vtolUsage','w')
-    f_v.write("2r,customer number,usage(%)\n")
-    f_v.close
-    """
     
     for i in range(N):
-        mapName = "data/map"+str(i)+".txt"
+        mapName = "data/map_r4_p0.4_"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
         #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
         r=12
         #customer = random.randint(2,25)
         customer = 10
         main06(mapName,customer,r,p=1.5)
-        main5(mapName,droneNum=customer,droneList=droneList)
+        #main5(mapName,droneNum=customer,droneList=droneList)
     
     #plotBCFile("data/multiUsage")
-    plotResultFile('data/result.txt')
+    #plotResultFile('data/result.txt')
         
         
 if __name__ == "__main__":
     droneList = [Vtol(),SmollMulti(),LargeMulti()]
-    main06('data/large4.txt',N=10,r=7,p=1.5)
-    main5('data/large4.txt',droneNum=10,droneList=droneList)
-    plotBCFile("data/__BC")
+    #main06('data/large4.txt',N=10,r=7,min_p=1.5,max_p=1.5)
+    #main5('data/large4.txt',droneNum=10,droneList=droneList)
+    #plotBCFile("data/__BC")
     #plotResultFile('data/result.txt')
-    #tryNtimes(10,droneList)
+    tryNtimes(10,droneList)
     #calcFlightabelTime()
     

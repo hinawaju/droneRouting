@@ -21,7 +21,8 @@ class Map:
         self.depo = node.Node(0,0,0,0)
         self.nodeList.append(self.depo)
         self.readMapFile(mapFilePass)
-        self.criateDmatrix()
+        #self.criateDmatrix()
+        
     
     #  ランダムマップ作成
     # node = 'x座標, y座標, demand 'のリスト作成
@@ -57,30 +58,38 @@ class Map:
 
         f.close()
     
-    def criateLargeMapFile(N:int,r,p,path):
+    def criateLargeMapFile(N:int,min_r,max_r,min_p,max_p,path):
         f = open(path,'w')
-        f.write(str(2*r)+", x-axis, y-axis, demand")
+        f.write(str(min_r)+"_"+str(max_r)+", x-axis, y-axis, demand")
         maplist = []
-        _r = -1*r
 
         for i in range(N) :
             f.write("\n")
-            x_rand = random.randint(_r,r)
-            y_rand = random.randint(_r,r)
+            x_rand = random.randint(min_r,max_r)
+            y_rand = random.randint(min_r,max_r)
+            if random.randint(0,1) == 1:
+                x_rand *= -1
+            if random.randint(0,1) == 1:
+                y_rand *= -1
             
             while True:
                 flag = 1
                 for x,y in maplist:
-                    if (x==x_rand and y==y_rand ) or (x_rand==0 and y_rand == 0):
+                    if (x==x_rand and y==y_rand ) or (x_rand==0 and y_rand==0):
                         flag = 0
                         break
                 if flag == 1:
                     break
                 elif flag == 0:
-                    x_rand = random.randint(_r,r)
-                    y_rand = random.randint(_r,r)
+                    x_rand = random.randint(min_r,max_r)
+                    y_rand = random.randint(min_r,max_r)
+                    if random.randint(0,1) == 1:
+                        x_rand *= -1
+                    if random.randint(0,1) == 1:
+                        y_rand *= -1
+                        
             maplist.append((x_rand,y_rand))
-            demand = random.randint(1,p*10)/10
+            demand = random.randint(min_p*10,max_p*10)/10
             #print("node_num : ", i+1, ", x : ", x_rand, ", y : ", y_rand, ", demand : ", demand,)
             nodeStr = str(x_rand)+","+str(y_rand)+","+str(demand)
             f.write(nodeStr)
@@ -153,3 +162,10 @@ class Map:
                 d = self.distance(i,j)
                 dList.append(d)
             self.dMatrix.append(dList)
+    
+    def calcDepoDistanceAve(self):
+        sumD = 0
+        for c in self.customerList:
+            sumD += self.distance2(self.depo,c)
+        
+        return sumD/self.CN
