@@ -22,9 +22,6 @@ class VrpState():
             self.eachFlights.append([])
         self.change_flight_1 = None
         self.change_flight_2 = None
-        self.CAP_PENALTY = 30 # batteryとpayload制限を超えた場合にコストに追加するペナルティ
-        self.PAYLOAD_PENALTY = 20 # payload制限超えたときにpayload%10*payload_penaltyを追加
-        self.BATTERY_PENALTY = 10 #batteryが100を超えた分にペナルティとして追加する倍率 battery_penalty*(BC-100)
         
         
     def move(self):
@@ -99,6 +96,15 @@ class VrpState():
             
         return sum_BC
     
+    #稼働している全てのドローンのバッテリ消費量の合計から到達不可能点へのペナルティバッテリ消費量を引いた値を出す
+    def calcSumBC(self):
+        sumBC = 0
+        for tuple in self.cost_list:
+            if tuple[0] != Airframe():
+                sumBC += tuple[2]/100*tuple[0].battery_J
+        
+        return sumBC
+    
     def calcCost(self,map_id):#TODO バッテリ消費量の単位を％からJなどに変更
         
         if len(self.miniCustomerMap[map_id]) == 0:  # self.miniCustomerMap[map_id]が空ベクトルのときTBが作られずserachBestRouting()でエラー吐く
@@ -121,7 +127,7 @@ class VrpState():
                 routing.searchBestRouteObjectB()
                 eachDroneBCList.append((drone,routing.BC, routing.FT, routing.bestRoute))
                 
-                if maxBC > routing.BC:
+                if maxBC > routing.BC/100*drone.battery_J:
                     maxBC = routing.BC
                     minIndex = index
                 index += 1
@@ -148,6 +154,7 @@ class VrpState():
                                                                                         
         #print("顧客数",len(self.miniCustomerMap[map_id]),"payload",sumPayload)
                                                                                 
+    
     
     def plotRouteFig(self):
         fig = pyplot.figure()

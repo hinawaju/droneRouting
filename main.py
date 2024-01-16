@@ -1,5 +1,6 @@
 import random
 from field.node import Node
+from model.airframe import Airframe
 from routing.travellingSalesmanProblem import TravellingSalesmanProblem
 from routing import calcThreshold
 from routing.singleDP import SingleDP
@@ -171,6 +172,9 @@ def main4(mapFilePath):
 def main5(mapFilePath,droneNum, droneList):
     map = Map(mapFilePath)
     customerList = map.customerList
+    sumDemand = map.calcSumDemand()
+    avePayload = sumDemand/map.CN
+    
     #初期解作成
     initial_state = VrpState(droneNum,droneList,map.CN)
     i = 0
@@ -180,11 +184,14 @@ def main5(mapFilePath,droneNum, droneList):
         if i == droneNum:
             i = 0
     
+    #到達不可能の顧客をカウント
+    impCustomer = 0
     for j in range(droneNum):
         initial_state.calcCost(j)
+        if initial_state.cost_list[j][0] == Airframe() and initial_state.miniCustomerMap[j] != []:
+            impCustomer += 1
 
     # 初期解表示
-    
     for i in range(droneNum):
         print("[",end=" ")
         for n in initial_state.eachFlights[i]:
@@ -193,9 +200,6 @@ def main5(mapFilePath,droneNum, droneList):
     
     
     vrp = VRP(initial_state)
-
-    #auto_schedule = vrp.auto(minutes=20) #  時間を20分くらいにしてもらう
-    #vrp.set_schedule(auto_schedule)
 
     state = vrp.anneal()
     print()
@@ -214,11 +218,6 @@ def main5(mapFilePath,droneNum, droneList):
     #state[0].plotRouteFig()
     """
     
-    #分析用
-    #vtolUsage = 0
-    #multiUsage = 0
-    #usedDrone = droneNum
-    
     for i in range(droneNum):
         if len(state[0].eachFlights[i])==0:
             #usedDrone -= 1
@@ -229,24 +228,14 @@ def main5(mapFilePath,droneNum, droneList):
         print(state[0].cost_list[i][0].type,"customer amount",len(state[0].eachFlights[i])-2,"payload",format(state[0].cost_list[i][3],'.2f'),"distance",format(d,'.2f'),"BC",format(state[0].cost_list[i][2],'.2f'))
         f.write(state[0].cost_list[i][0].type+","+str(format(d,'.2f'))+","+str(format(state[0].cost_list[i][3],'.2f'))+","+str(format(state[0].cost_list[i][2],'.2f'))+","+str(len(state[0].eachFlights[i])-2)+"\n")
         
-        
-        #if state[0].cost_list[i][0].type == "multi copter":
-        #    multiUsage += 1
-        #elif state[0].cost_list[i][0].type == "vtol":
-        #    vtolUsage += 1
-        
     f.close
     
-    """
-    f_m = open("data/multiUsage","a")
-    f_m.write(str(2*map.r)+","+str(map.CN)+","+str(multiUsage/usedDrone *100)+",\n")
-    f_m.close
+    #TODO state[1]には実行不可能解のペナルティ付きBCも含まれるので不適切
+    sumBC = state[0].calcSumBC()
+    f_BC = open("data/__BC","a")
+    f_BC.write(str(2*map.r)+","+str(avePayload)+","+str(sumBC)+","+str(impCustomer)+",\n")
+    f_BC.close
     
-    f_v = open("data/vtolUsage","a")
-    f_v.write(str(2*map.r)+","+str(map.CN)+","+str(vtolUsage/usedDrone *100)+",\n")
-    f_v.close
-    
-    """
 
 def plotResultFile(path):
     fig = pyplot.figure()
@@ -310,13 +299,13 @@ def plotResultFile(path):
     
     pyplot.show()
 
-"""
-def plotUsageFile(path):
+
+def plotBCFile(path):
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
     
     ax.set_xlabel("delivery area (km2)")
-    ax.set_ylabel("costomer")
+    ax.set_ylabel("payload")
     #ax.set_xlim([0, 120])
     #ax.set_ylim([0, 1.2])
     
@@ -326,23 +315,26 @@ def plotUsageFile(path):
     next(f) #  ファイルの2行目から読み込み
     
     while True: 
-        usageStr = f.readline() #  ファイルから1行読む
-        if usageStr == '': #  EOFになったら終了
+        BCStr = f.readline() #  ファイルから1行読む
+        if BCStr == '': #  EOFになったら終了
             break
     
-        usageList = usageStr.split(',')
-        area = float(usageList[0])
-        nodeNum = float(usageList[1])
-        usage = round(float(usageList[2]),2)
+        BCList = BCStr.split(',')
+        r2 = float(BCList[0])
+        avePay = float(BCList[1])
+        BC = float(BCList[2]) #round(float(BCList[2]),2)
+        impCostomer = int(BCList[3])
     
-        mp = ax.scatter(area,nodeNum,s=50,c=usage,cmap="rainbow",vmin=0,vmax=100)
+        mp = ax.scatter(r2,avePay,s=50,c=BC,cmap="rainbow")#vmin=0,vmax=100
+        if impCostomer != 0:
+            ax.text(r2,avePay,impCostomer)
         
     cbar = pyplot.colorbar(mp)
-    cbar.ax.set_ylim(0,100)
-    cbar.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(10))
+    #cbar.ax.set_ylim(0,100)
+    #cbar.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(10))
     
     pyplot.show()
-"""
+
     
 def tryNtimes(N,droneList):
     """
@@ -370,7 +362,7 @@ def tryNtimes(N,droneList):
         main06(mapName,customer,r,p=1.5)
         main5(mapName,droneNum=customer,droneList=droneList)
     
-    #plotUsageFile("data/multiUsage")
+    #plotBCFile("data/multiUsage")
     plotResultFile('data/result.txt')
         
         
@@ -378,7 +370,7 @@ if __name__ == "__main__":
     droneList = [Vtol(),SmollMulti(),LargeMulti()]
     main06('data/large4.txt',N=10,r=7,p=1.5)
     main5('data/large4.txt',droneNum=10,droneList=droneList)
-    #plotUsageFile("data/multiUsage")
+    plotBCFile("data/__BC")
     #plotResultFile('data/result.txt')
     #tryNtimes(10,droneList)
     #calcFlightabelTime()
