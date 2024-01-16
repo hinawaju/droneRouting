@@ -305,8 +305,8 @@ def plotBCFile(path):
     fig = pyplot.figure()
     ax = fig.add_subplot(111)
     
-    ax.set_xlabel("delivery area (km2)")
-    ax.set_ylabel("payload")
+    ax.set_xlabel("average distance between depo and customer (km)")
+    ax.set_ylabel("average demand of customer (kg)")
     #ax.set_xlim([0, 120])
     #ax.set_ylim([0, 1.2])
     
@@ -321,14 +321,14 @@ def plotBCFile(path):
             break
     
         BCList = BCStr.split(',')
-        r2 = float(BCList[0])
+        aveDis = float(BCList[0])
         avePay = float(BCList[1])
         BC = float(BCList[2]) #round(float(BCList[2]),2)
         impCostomer = int(BCList[3])
     
-        mp = ax.scatter(r2,avePay,s=50,c=BC,cmap="rainbow")#vmin=0,vmax=100
+        mp = ax.scatter(aveDis,avePay,s=50,c=BC,cmap="rainbow")#vmin=0,vmax=100
         if impCostomer != 0:
-            ax.text(r2,avePay,impCostomer)
+            ax.text(aveDis,avePay,impCostomer)
         
     cbar = pyplot.colorbar(mp)
     #cbar.ax.set_ylim(0,100)
