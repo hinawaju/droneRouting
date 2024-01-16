@@ -74,8 +74,8 @@ def main05(nodeList):
     pyplot.show()
     
 # 広いマップ作成
-def main06(path,N,r,min_p,max_p):
-    Map.criateLargeMapFile(N,r,min_p,max_p,path)
+def main06(path,N,min_r,max_r,min_p,max_p):
+    Map.criateLargeMapFile(N,min_r,max_r,min_p,max_p,path)
     
 # 制限の範囲内での1機体でのルーティング
 def main1(mapPath):
@@ -343,10 +343,13 @@ def tryNtimes(N,droneList):
         mapName = "data/map_r4_p0.4_"+str(i)+".txt"
         #ランダムでエリア半径と顧客数を作成
         #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
-        r=12
-        #customer = random.randint(2,25)
+        min_r=12
+        max_r=12
+        min_p=0.1
+        max_p=0.2
+        
         customer = 10
-        main06(mapName,customer,r,p=1.5)
+        main06(mapName,customer,min_r,max_r,min_p,max_p)
         #main5(mapName,droneNum=customer,droneList=droneList)
     
     #plotBCFile("data/multiUsage")
