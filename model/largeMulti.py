@@ -5,7 +5,7 @@ class LargeMulti(airframe.Airframe):
     def __init__(self):
         super().__init__()
         self.battery_p = 100  # 機体として正しい値は321120*9/1.4 321120が機体そのままのバッテリー量の7割、今回機体を比較するにあたって機体重量を基準に合わせて9/1.4倍してるのでその他のパラメータも9/1.4倍
-        self.battery_J = 5400000
+        self.battery_J = 4320000 #5400000
         self.takeOffTime_m = 0.5  # 離着陸にかかる時間
         self.speed_km_m = 0.78  # 機体速度13m/s
         self.maxPayload_kg = 7 

@@ -186,7 +186,7 @@ def main5(mapFilePath,droneNum, droneList):
     impCustomer = 0
     for j in range(droneNum):
         initial_state.calcCost(j)
-        if initial_state.cost_list[j][0] == Airframe() and initial_state.miniCustomerMap[j] != []:
+        if initial_state.cost_list[j][0].type == "null" and initial_state.cost_list[j][2] != 0:
             impCustomer += 1
 
     # 初期解表示
@@ -201,7 +201,7 @@ def main5(mapFilePath,droneNum, droneList):
 
     state = vrp.anneal()
     print()
-    f = open('data/result.txt','a')
+    f = open('data/result_3drone_'+r_p+'.txt','a')
     #f.write("drone type, distance, payload, BC"+"\n")
     
     """
@@ -230,7 +230,7 @@ def main5(mapFilePath,droneNum, droneList):
     
     sumDemand = map.calcSumDemand()
     avePayload = sumDemand/map.CN
-    aveDepoDistance = map.calcDepoDistanceAve
+    aveDepoDistance = map.calcDepoDistanceAve()
     #TODO state[1]には実行不可能解のペナルティ付きBCも含まれるので不適切
     sumBC = state[0].calcSumBC()
     f_BC = open("data/__BC","a")
@@ -326,7 +326,7 @@ def plotBCFile(path):
         BC = float(BCList[2]) #round(float(BCList[2]),2)
         impCostomer = int(BCList[3])
     
-        mp = ax.scatter(aveDis,avePay,s=50,c=BC,cmap="rainbow")#vmin=0,vmax=100
+        mp = ax.scatter(aveDis,avePay,s=50,c=BC,cmap="rainbow",vmin=0,vmax=5400000)
         if impCostomer != 0:
             ax.text(aveDis,avePay,impCostomer)
         
@@ -336,32 +336,35 @@ def plotBCFile(path):
     
     pyplot.show()
 
-    
+#r_p = "r12_p1.2"
+r_p = "test"
+
 def tryNtimes(N,droneList):
     
     for i in range(N):
-        mapName = "data/map_r4_p0.4_"+str(i)+".txt"
-        #ランダムでエリア半径と顧客数を作成
-        #r = random.randint(5,18) # 半径18で最長が50.8km vtolの最大飛行距離が50km
-        min_r=12
-        max_r=12
-        min_p=0.1
-        max_p=0.2
+        mapName = "data/map_"+r_p+"_"+str(i)+".txt"
         
+        min_r=0
+        max_r=4
+        min_p=0.9
+        max_p=1.2
         customer = 10
-        main06(mapName,customer,min_r,max_r,min_p,max_p)
-        #main5(mapName,droneNum=customer,droneList=droneList)
+        #main06(mapName,customer,min_r,max_r,min_p,max_p)
+        main5(mapName,droneNum=customer,droneList=droneList)
     
     #plotBCFile("data/multiUsage")
     #plotResultFile('data/result.txt')
         
         
 if __name__ == "__main__":
-    droneList = [Vtol(),SmollMulti(),LargeMulti()]
-    #main06('data/large4.txt',N=10,r=7,min_p=1.5,max_p=1.5)
-    #main5('data/large4.txt',droneNum=10,droneList=droneList)
-    #plotBCFile("data/__BC")
+    droneList = [LargeMulti(),SmollMulti(),Vtol()]
+    main06('data/test.txt',N=10,min_r=0,max_r=9,min_p=0.1,max_p=0.4)
+    main5('data/test.txt',droneNum=10,droneList=droneList)
+    #main5('data/map_r12_p0.4_0.txt',droneNum=10,droneList=droneList)
+    plotBCFile("data/__BC")
+    #plotBCFile("data/__BC_Lmulti")
+    #plotBCFile("data/__BC_3drone")
     #plotResultFile('data/result.txt')
-    tryNtimes(10,droneList)
+    #tryNtimes(10,droneList)
     #calcFlightabelTime()
     

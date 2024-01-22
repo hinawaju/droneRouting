@@ -100,7 +100,7 @@ class VrpState():
     def calcSumBC(self):
         sumBC = 0
         for tuple in self.cost_list:
-            if tuple[0] != Airframe():
+            if tuple[0].type != "null":
                 sumBC += tuple[2]/100*tuple[0].battery_J
         
         return sumBC
@@ -126,24 +126,14 @@ class VrpState():
                 routing.criateTBobjectB()
                 routing.searchBestRouteObjectB()
                 eachDroneBCList.append((drone,routing.BC, routing.FT, routing.bestRoute))
-                
-                if maxBC > routing.BC/100*drone.battery_J:
+                #print(drone.type, routing.BC/100*drone.battery_J)#TODO
+                if routing.BC < 100 and maxBC > routing.BC/100*drone.battery_J:
                     maxBC = routing.BC
                     minIndex = index
+                    
                 index += 1
         
-        """
-        #評価値のBCにペナルティをつける。制約をつけた状態だと不要
-        for i in range(len(self.droneList)):
-            penaltyBCList_p.append(eachDroneBCList[i][0])
-            if sumPayload > self.droneList[i].maxPayload_kg or eachDroneBCList[i][0] > 100:
-                penaltyBCList_p[i] += self.CAP_PENALTY
-                if eachDroneBCList[i][0] > 100:
-                    penaltyBCList_p[i] += (eachDroneBCList[i][0]-100)*self.BATTERY_PENALTY
-                if sumPayload > self.droneList[i].maxPayload_kg:
-                    penaltyBCList_p[i] += (sumPayload-self.droneList[i].maxPayload_kg)*10*self.PAYLOAD_PENALTY
-            penaltyBCList_J.append(penaltyBCList_p[i]/100*self.droneList[i].battery_J)
-        """    
+        
         if len(eachDroneBCList) != 0 and eachDroneBCList[minIndex][1] < 100 :
             self.cost_list[map_id] = (eachDroneBCList[minIndex][0],eachDroneBCList[minIndex][2],eachDroneBCList[minIndex][1],sumPayload)
             self.eachFlights[map_id] = eachDroneBCList[minIndex][3]
